@@ -94,10 +94,14 @@ if __name__ == "__main__":
     question = "How many goals does Kylian Mbappe have for Real Madrid this season?"
     user_intention = UserIntention(chatbot)
 
-    embeddings = user_intention.get_embedding_openai(question)
+    chatbot.question = question
 
-    sim_scores = user_intention.calc_cosine_sim(embeddings)
-    print(sim_scores)
+    user_intention.run()
+
+    
+    print(user_intention.valid_question)
+    print(user_intention.entity_of_interest)
+    print(user_intention.aggregation)
 
 
     

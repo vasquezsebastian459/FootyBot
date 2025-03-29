@@ -15,7 +15,6 @@ from get_top_tables import TopTables
 from openai import OpenAI
 import spacy
 from query_runner import QueryRunner
-from run_query import get_db_data, init_connection_pool,close_connection_pool
 from post_processing import PostProcessing
 
 class Chatbot:

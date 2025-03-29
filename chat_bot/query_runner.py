@@ -1,11 +1,11 @@
-from chat_query import run_chat_query, write_json,query_gen_parallel
+from chat_query import query_gen_parallel
 import traceback
-from sql_query_validation import validate_sql_query , add_info_to_query,create_table2columns_dict2,extract_sql_tokens
+from sql_utils.sql_query_validation import validate_sql_query , add_info_to_query,create_table2columns_dict2,extract_sql_tokens
 import time
 from print_colors import print_colored, print_colored_full_line
-from sql_query_corrector import openai_correct_query, modify_sql_query,is_not_null_sql_query
+from sql_utils.sql_query_corrector import openai_correct_query, modify_sql_query,is_not_null_sql_query
 from concurrent.futures import ThreadPoolExecutor
-from run_query import get_db_data, init_connection_pool,close_connection_pool
+from run_query import get_db_data
 
 import json
 
@@ -153,9 +153,7 @@ class QueryRunner:
             print_colored(f"All queries are invalid: RERUN", "BACKGROUND_RED")
             print_colored(f"ADD LOGIC TO HANDLE RERUN!", "BACKGROUND_RED")
             print_colored_full_line("", "BACKGROUND_RED")
-
-            # Here we write the output to a file so we can check what were the queries generated that gave an error
-            write_json(response, prefix = 'Re_Run', output_dir= 'chat_bot/temporary_logs') 
+            
             response['Performance Data']['run_chat_bot_time']['Rerun'] = time.time() - start_time
             rerun = True
         

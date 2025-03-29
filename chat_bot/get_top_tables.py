@@ -66,13 +66,35 @@ class TopTables:
                 table2cols_shortlist.append(table_dict)
                 print()
         return table2cols_shortlist
+
     
+    def enhance_sim_scores(self, similarity_scores):
+        entity = self.chatbot.user_intention.entity_of_interest.lower()
+        agg = self.chatbot.user_intention.aggregation.lower()
+
+        enhanced_scores = {}
+        for table, base_score in similarity_scores.items():
+            table_lower = table.lower()
+
+            boost = 0.0
+            if entity in table_lower:
+                boost += 0.05
+            if agg in table_lower:
+                boost += 0.05
+
+            enhanced_scores[table] = base_score + boost
+
+        return enhanced_scores
+        
 
     def run(self):
 
         embeddings = self.get_embedding_openai(self.chatbot.question)
         sim_scores = self.calc_cosine_sim(embeddings)
-        top_tables = self.retrieve_topn_tables_keywords(sim_scores)
+
+        enhanced_sim_scores = self.enhance_sim_scores(sim_scores)
+
+        top_tables = self.retrieve_topn_tables_keywords(enhanced_sim_scores)
         self.top_tables = self.extract_tables_from_schema(top_tables)
         
         return self.top_tables
@@ -87,15 +109,31 @@ class TopTables:
 
 if __name__ == "__main__":
     from run_chatbot import Chatbot
+    from get_user_intention import UserIntention
     question = "How many goals does Kylian Mbappe have for Real Madrid this season?"
 
     chatbot = Chatbot()
     chatbot.load_data()
     chatbot.question = question
+
+    user_intention = UserIntention(chatbot)
+
+    user_intention.run()
+
+    
+    print(user_intention.valid_question)
+    print(user_intention.entity_of_interest)
+    print(user_intention.aggregation)
+
+    chatbot.user_intention.valid_question = user_intention.valid_question
+    chatbot.user_intention.entity_of_interest = user_intention.entity_of_interest
+    chatbot.user_intention.aggregation = user_intention.aggregation
+
+
     top_tables_extractor = TopTables(chatbot)
 
-    top_tables_extractor.run()
-    
+    top_tables = top_tables_extractor.run()
+    print(top_tables_extractor.top_tables_names)
     # embeddings = top_tables_extractor.get_embedding_openai(question)
     # sim_scores = top_tables_extractor.calc_cosine_sim(embeddings)
     # print(sim_scores)
