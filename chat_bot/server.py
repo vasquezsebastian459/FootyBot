@@ -31,7 +31,23 @@ def chat():
     user_question = data['message']
     context = data['context']
 
-    output = chatbot.run(user_question, context)
+
+    try:
+        output = chatbot.run(user_question, context)
+    except Exception as e:
+        print(f"Error: {e}")
+        traceback.print_exc()
+        output = {
+            'response': "Sorry, I encountered an error. Please try again later.",
+            'keyinfo_context': context,
+            'links_info': {}
+        }
+
+
+    # Get Overall Time
+    end_time = time.time()
+    overall_time = end_time - chatbot.performance.start_overall_time
+    print(f"Overall Time: {overall_time}")
 
     return jsonify(output)
 

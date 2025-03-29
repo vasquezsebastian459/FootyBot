@@ -160,12 +160,17 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .chatbot-container img.main-logo {
+    max-width: 250px;
+    width: auto;
+}
     </style>
 </head>
 <body>
     <div class="chatbot-container">
-        <img src="/images/driblab_icon.png" alt="Driblab Logo">
-        <h2>Football Chatbot</h2>
+        <img src="/images/driblab_icon.png" alt="Driblab Logo" class="main-logo">
+        <!-- <h2>Football Chatbot</h2> -->
         <p>I am a football Chatbot. Please only ask football-related questions!</p>
         <div class="chat-window" id="chat-window">
             <!-- Chat messages will appear here -->

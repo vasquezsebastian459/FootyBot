@@ -1,4 +1,5 @@
 import traceback
+import requests
 from extract_keyinfo import KeyInfoExtractor
 from performance import Performance
 import time
@@ -88,7 +89,21 @@ class Chatbot:
 
         self.key_info_extractor.key_info = self.key_info_extractor.update_key_info_context(context)
 
+        # Get Question Classification
+        res = requests.post("http://localhost:5005/predict_question", json={"question": self.question})
+        valid_question = res.json()['prediction'][0]
+        valid_question = True if valid_question == 1 else False
+        
         response = {}
+
+        # Early return if the question is not valid
+        if not valid_question:
+            return {
+                'response': "Sorry this question is not about football. Please ask a question related to football.",
+                'keyinfo_context': self.context,
+                'links_info': {}
+            }
+        
 
         start_time = time.time()
         self.key_info_extractor.run()
@@ -139,15 +154,7 @@ class Chatbot:
         print(f"Aggregation: {self.user_intention.aggregation}")
         print(f"User Intention Time: {self.performance.get_user_intention_time}")
 
-        # Early return if the question is not valid
-
-        if not self.user_intention.valid_question:
-            # self.chatbot.performance.tokens_used['question_classifier'] = QC_tokens_used
-            return {
-                'response': "Sorry this question is not about football. Please ask a question related to football.",
-                'keyinfo_context': self.context,
-                'links_info': {}
-            }
+        
 
 
         # If there is no Key Information extracted, ask the user to be more specific

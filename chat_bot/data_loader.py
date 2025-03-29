@@ -10,6 +10,7 @@ import os
 import io  
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 from sklearn.preprocessing import LabelEncoder
 import torch
 
@@ -47,6 +48,11 @@ class DataLoaderService:
         # Load label encoder classes for aggregation model
         self.agg_le = LabelEncoder()
         self.agg_le.classes_ = np.load("user_intention/models/results_agg/label_classes.npy", allow_pickle=True)
+
+        # Load question classifier model
+        self.question_classifier_model = BertForSequenceClassification.from_pretrained("question_classifier/models/football_classifier")
+        self.question_classifier_tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
+        self.question_classifier_model.eval()  # Set model to evaluation mode
 
         self.init_dfs()
         self.initialized = True
@@ -124,6 +130,18 @@ class DataLoaderService:
             pred = torch.argmax(outputs.logits, dim=1).item()
         return self.agg_le.inverse_transform([pred])[0]
     
+
+    def predict_question(self, question):
+        
+        inputs = self.question_classifier_tokenizer(question, return_tensors="pt", truncation=True, padding=True)
+        with torch.no_grad():
+            outputs = self.question_classifier_model(**inputs)
+            logits = outputs.logits
+            probs = torch.softmax(logits, dim=1)
+            pred_label = torch.argmax(probs, dim=1).item()
+        return pred_label, probs.squeeze().tolist()
+
+    
     
 
 # Flask App
@@ -188,6 +206,18 @@ def predict_aggregation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+
+@app.route("/predict_question", methods=["POST"])   
+def predict_question():
+    data = request.get_json()
+    question = data.get("question")
+    if not question:
+        return jsonify({"error": "Missing 'question' in request body"}), 400
+    try:
+        result = service.predict_question(question)
+        return jsonify({"prediction": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005, debug=False)

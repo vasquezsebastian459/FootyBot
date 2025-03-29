@@ -25,6 +25,13 @@ if __name__ == "__main__":
 
     print(f"QUESTION: {question}")
 
+    # TEST QUESTION CLASSIFICATION
+    start_time = time.time()
+    res = requests.post("http://localhost:5005/predict_question", json={"question": question})
+    end_time = time.time()
+    print(f"Time taken to question classification: {end_time - start_time} seconds")
+    print(res.json())
+
     # TEST AGGREGATION
     start_time = time.time()
     res = requests.post("http://localhost:5005/predict_aggregation", json={"question": question})

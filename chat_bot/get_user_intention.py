@@ -61,14 +61,7 @@ class UserIntention:
     def run(self):
 
         self.question = self.chatbot.question
-        self.context = self.chatbot.context
-
-        print(f"RUNNING USER INTENTION")
-
-        valid_question,QC_tokens_used = self.question_classifier()
-
-        self.valid_question = valid_question
-        
+        self.context = self.chatbot.context        
         
         # Extract User's Entity of Interest
         start_time = time.time()
