@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driblab Chatbot</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .chatbot-container {
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        .chatbot-container img {
+            max-width: 100px;
+            align-self: center;
+            margin-bottom: 10px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #343a40;
+            text-align: center;
+        }
+        p {
+            color: #6c757d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .chat-window {
+            flex: 1;
+            height: calc(100% - 160px); /* Adjust height based on container padding and other elements */
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f1f3f5;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .input-container {
+            display: flex;
+            margin-top: auto;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .input-container input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .input-container button {
+            padding: 15px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #ffffff;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        .chat-message {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .chat-message.user {
+            background-color: #d4edda;
+            align-self: flex-end;
+            color: #155724;
+        }
+        .chat-message.assistant {
+            background-color: #cce5ff;
+            align-self: flex-start;
+            color: #004085;
+        }
+        .chat-message a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .chat-message a:hover {
+            text-decoration: underline;
+        }
+        .clear-chat {
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            align-self: center;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .clear-chat:hover {
+            background-color: #c82333;
+        }
+        .loading-container {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #065ab5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        .loading-text {
+            color: #007bff;
+            font-size: 16px;
+        }
+
+        .send-button {
+    padding: 1px 20px; /* Adjust padding to match your design */
+    background-color: #066cd9cb; /* Blue background */
+    border-radius: 0 8px 8px 0; /* Rounded corners on the right */
+    cursor: pointer; /* Makes the element clickable */
+    display: flex; /* Aligns the image centrally if needed */
+    align-items: center; /* Centers the image vertically */
+    justify-content: center; /* Centers the image horizontally */
+        }
+
+    .send-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <img src="/images/driblab_icon.png" alt="Driblab Logo">
+        <h2>Football Chatbot</h2>
+        <p>I am a football Chatbot. Please only ask football-related questions!</p>
+        <div class="chat-window" id="chat-window">
+            <!-- Chat messages will appear here -->
+            <div class="loading-container" id="loading">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Thinking...</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <div class="send-button" onclick="sendMessage()">
+                <img src="/images/new_send_buttom.png" alt="Send" style="width: 25px;">
+            </div>
+        </div>
+        
+        <button class="clear-chat" onclick="clearChat()">Clear Chat</button>
+    </div>
+    <script>
+        let messages = [{ role: "assistant", content: "How may I help you?" }];
+        let context = {}; // Initialize context as an empty object
+
+        function displayMessages() {
+    const chatWindow = document.getElementById('chat-window');
+    const loading = document.getElementById('loading');
+    chatWindow.innerHTML = '';
+    messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message ' + message.role;
+
+        if (message.role === "assistant") {
+            // Include the logo with the assistant's messages
+            const logoImg = document.createElement('img');
+            logoImg.src = "/images/driblab_logo.png";
+            logoImg.alt = "Driblab Logo";
+            logoImg.style = "width: 20px; vertical-align: middle; margin-right: 5px;"; // Adjust style as needed
+
+            messageDiv.innerHTML = `<span>${logoImg.outerHTML}</span> ${message.content}`;
+        } else if (message.role === "user") {
+            // Display user messages without prefix
+            messageDiv.innerHTML = message.content;
+        } else {
+            // Default format if needed for other roles
+            messageDiv.innerHTML = message.role.charAt(0).toUpperCase() + message.role.slice(1) + ': ' + message.content;
+        }
+
+        chatWindow.appendChild(messageDiv);
+    });
+    chatWindow.appendChild(loading);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const userMessage = input.value;
+            if (userMessage.trim()) {
+                messages.push({ role: "user", content: userMessage });
+                displayMessages();
+                input.value = '';
+
+                const loading = document.getElementById('loading');
+                loading.style.display = 'flex';
+
+                console.log('Sending message:', userMessage);
+                console.log('Current context:', context);
+
+                // Send user message to the backend to get a response
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: userMessage, context: context })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Received data:', data);
+                    messages.push({ role: "assistant", content: processLinks(data.response, data.links_info) });
+
+                    // Update the context with the new data received
+                    context = data.keyinfo_context;
+                    displayMessages();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    loading.style.display = 'none';
+                });
+            }
+        }
+
+        function processLinks(response, linksInfo) {
+            Object.keys(linksInfo).forEach(key => {
+                const linkData = linksInfo[key];
+                Object.keys(linkData).forEach(linkKey => {
+                    const link = linkData[linkKey];
+                    response = response.replace(linkKey, `<a href="${link.link}" target="_blank">${linkKey}</a>`);
+                });
+            });
+            return response;
+        }
+
+        function clearChat() {
+            messages = [{ role: "assistant", content: "How may I help you?" }];
+            displayMessages();
+        }
+
+        // Add event listener for "Enter" key on the input field
+        document.getElementById('user-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize chat with the first message
+        displayMessages();
+    </script>
+</body>
+</html>

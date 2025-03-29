@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Test</title>
+    <style>
+        .message {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .assistant {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div id="messages-container"></div>
+
+    <script>
+        const messages = [];
+
+        function processLinks(response, linksInfo) {
+            // Flatten all positions into a single array to sort and process without conflict
+            const replacements = [];
+
+            // Iterate over each entity type in linksInfo
+            Object.keys(linksInfo).forEach(entityType => {
+                const entityData = linksInfo[entityType];
+                // Iterate over each entity within the type
+                Object.keys(entityData).forEach(entityKey => {
+                    const entityInfo = entityData[entityKey];
+                    const positions = entityInfo.positions;
+                    const link = entityInfo.link;
+                    // Collect all replacements
+                    positions.forEach(pos => {
+                        replacements.push({
+                            start_pos: pos.start_pos,
+                            end_pos: pos.end_pos,
+                            entity: response.slice(pos.start_pos, pos.end_pos),
+                            link: link
+                        });
+                    });
+                });
+            });
+
+            // Sort replacements by start_pos in descending order
+            replacements.sort((a, b) => b.start_pos - a.start_pos);
+
+            // Apply replacements to the response string
+            replacements.forEach(replacement => {
+                response = response.slice(0, replacement.start_pos) + 
+                    `<a href="${replacement.link}" target="_blank">${replacement.entity}</a>` + 
+                    response.slice(replacement.end_pos);
+            });
+
+            return response;
+        }
+
+        function displayMessages() {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                if (message.role === 'assistant') {
+                    messageElement.classList.add('assistant');
+                }
+                messageElement.innerHTML = message.content;
+                container.appendChild(messageElement);
+            });
+        }
+
+// Example data to test the function
+const linksInfo = {   'players': {   'Vinicius Junior': {   'id': 1163220,
+                                          'positions': [   {   'start_pos': 981,
+                                                               'end_pos': 996}],
+                                          'link': 'https://pro.driblab.com/player/1163220'}},
+    'teams': {},
+    'seasons': {   'ESP I 2023': {   'id': 816527,
+                                     'positions': [   {   'start_pos': 62,
+                                                          'end_pos': 72},
+                                                      {   'start_pos': 1029,
+                                                          'end_pos': 1039}],
+                                     'link': 'https://pro.driblab.com/league/1'}},
+    'matches': {   'Almeria vs Real Madrid': {   'id': 549861,
+                                                 'positions': [   {   'start_pos': 122,
+                                                                      'end_pos': 144}],
+                                                 'link': 'https://pro.driblab.com/game/549861'},
+                   'Celta de Vigo vs Real Madrid': {   'id': 549869,
+                                                       'positions': [   {   'start_pos': 151,
+                                                                            'end_pos': 179}],
+                                                       'link': 'https://pro.driblab.com/game/549869'},
+                   'Real Madrid vs UD Las Palmas': {   'id': 549920,
+                                                       'positions': [   {   'start_pos': 186,
+                                                                            'end_pos': 214}],
+                                                       'link': 'https://pro.driblab.com/game/549920'},
+                   'Girona FC vs Real Madrid': {   'id': 549929,
+                                                   'positions': [   {   'start_pos': 221,
+                                                                        'end_pos': 245}],
+                                                   'link': 'https://pro.driblab.com/game/549929'},
+                   'Real Madrid vs Osasuna': {   'id': 549940,
+                                                 'positions': [   {   'start_pos': 252,
+                                                                      'end_pos': 274}],
+                                                 'link': 'https://pro.driblab.com/game/549940'},
+                   'Sevilla vs Real Madrid': {   'id': 549950,
+                                                 'positions': [   {   'start_pos': 281,
+                                                                      'end_pos': 303}],
+                                                 'link': 'https://pro.driblab.com/game/549950'},
+                   'FC Barcelona vs Real Madrid': {   'id': 549957,
+                                                      'positions': [   {   'start_pos': 310,
+                                                                           'end_pos': 337}],
+                                                      'link': 'https://pro.driblab.com/game/549957'},
+                   'Real Madrid vs Rayo Vallecano': {   'id': 549965,
+                                                        'positions': [   {   'start_pos': 344,
+                                                                             'end_pos': 373}],
+                                                        'link': 'https://pro.driblab.com/game/549965'},
+                   'Real Madrid vs Valencia': {   'id': 549978,
+                                                  'positions': [   {   'start_pos': 381,
+                                                                       'end_pos': 404}],
+                                                  'link': 'https://pro.driblab.com/game/549978'},
+                   'Real Madrid vs RCD Mallorca': {   'id': 550047,
+                                                      'positions': [   {   'start_pos': 412,
+                                                                           'end_pos': 439},
+                                                                       {   'start_pos': 738,
+                                                                           'end_pos': 765}],
+                                                      'link': 'https://pro.driblab.com/game/550047'},
+                   'Getafe vs Real Madrid': {   'id': 550056,
+                                                'positions': [   {   'start_pos': 447,
+                                                                     'end_pos': 468}],
+                                                'link': 'https://pro.driblab.com/game/550056'},
+                   'Real Madrid vs Almeria': {   'id': 550063,
+                                                 'positions': [   {   'start_pos': 476,
+                                                                      'end_pos': 498}],
+                                                 'link': 'https://pro.driblab.com/game/550063'},
+                   'UD Las Palmas vs Real Madrid': {   'id': 550072,
+                                                       'positions': [   {   'start_pos': 506,
+                                                                            'end_pos': 534}],
+                                                       'link': 'https://pro.driblab.com/game/550072'},
+                   'Real Madrid vs Girona FC': {   'id': 550101,
+                                                   'positions': [   {   'start_pos': 542,
+                                                                        'end_pos': 566}],
+                                                   'link': 'https://pro.driblab.com/game/550101'},
+                   'Rayo Vallecano vs Real Madrid': {   'id': 550106,
+                                                        'positions': [   {   'start_pos': 574,
+                                                                             'end_pos': 603}],
+                                                        'link': 'https://pro.driblab.com/game/550106'},
+                   'Real Madrid vs Sevilla': {   'id': 550117,
+                                                 'positions': [   {   'start_pos': 611,
+                                                                      'end_pos': 633}],
+                                                 'link': 'https://pro.driblab.com/game/550117'},
+                   'Valencia vs Real Madrid': {   'id': 550130,
+                                                  'positions': [   {   'start_pos': 641,
+                                                                       'end_pos': 664}],
+                                                  'link': 'https://pro.driblab.com/game/550130'},
+                   'Real Madrid vs Celta de Vigo': {   'id': 550143,
+                                                       'positions': [   {   'start_pos': 672,
+                                                                            'end_pos': 700}],
+                                                       'link': 'https://pro.driblab.com/game/550143'},
+                   'Osasuna vs Real Madrid': {   'id': 550147,
+                                                 'positions': [   {   'start_pos': 708,
+                                                                      'end_pos': 730}],
+                                                 'link': 'https://pro.driblab.com/game/550147'},
+                   'Real Madrid vs FC Barcelona': {   'id': 550181,
+                                                      'positions': [   {   'start_pos': 773,
+                                                                           'end_pos': 800}],
+                                                      'link': 'https://pro.driblab.com/game/550181'},
+                   'Real Sociedad vs Real Madrid': {   'id': 550196,
+                                                       'positions': [   {   'start_pos': 808,
+                                                                            'end_pos': 836}],
+                                                       'link': 'https://pro.driblab.com/game/550196'},
+                   'Real Madrid vs Cadiz': {   'id': 550204,
+                                               'positions': [   {   'start_pos': 844,
+                                                                    'end_pos': 864}],
+                                               'link': 'https://pro.driblab.com/game/550204'},
+                   'Real Madrid vs Deportivo Alaves': {   'id': 550229,
+                                                          'positions': [   {   'start_pos': 872,
+                                                                               'end_pos': 903}],
+                                                          'link': 'https://pro.driblab.com/game/550229'},
+                   'Real Madrid vs Real Betis': {   'id': 550248,
+                                                    'positions': [   {   'start_pos': 911,
+                                                                         'end_pos': 936}],
+                                                    'link': 'https://pro.driblab.com/game/550248'}}};
+function processLinks2(response, linksInfo) {
+            Object.keys(linksInfo).forEach(key => {
+                const linkData = linksInfo[key];
+                Object.keys(linkData).forEach(linkKey => {
+                    const link = linkData[linkKey];
+                    response = response.replace(linkKey, `<a href="${link.link}" target="_blank">${linkKey}</a>`);
+                });
+            });
+            return response;
+        }
+
+        let response = "You should watch the following games of Vinicius Junior from the ESP I 2023 season:<br>1. Real Madrid vs Athletic Club<br>2. Real Madrid vs Almeria<br>3. Real Madrid vs Celta de Vigo<br>4. Real Madrid vs UD Las Palmas<br>5. Real Madrid vs Girona FC<br>6. Real Madrid vs Osasuna<br>7. Real Madrid vs Sevilla<br>8. Real Madrid vs FC Barcelona<br>9. Real Madrid vs Rayo Vallecano<br>10. Real Madrid vs Valencia<br>11. Real Madrid vs RCD Mallorca<br>12. Real Madrid vs Getafe<br>13. UD Las Palmas vs Real Madrid<br>14. Real Madrid vs Girona FC<br>15. Rayo Vallecano vs Real Madrid<br>16. Real Madrid vs Sevilla<br>17. Valencia vs Real Madrid<br>18. Real Madrid vs Celta de Vigo<br>19. Osasuna vs Real Madrid<br>20. RCD Mallorca vs Real Madrid<br>21. Real Madrid vs FC Barcelona<br>22. Real Sociedad vs Real Madrid<br>23. Real Madrid vs Cadiz<br>24. Real Madrid vs Deportivo Alaves<br>25. Real Madrid vs Real Betis<br><br>These games showcase Vinicius Junior's performances in the ESP I 2023 season, highlighting various statistics such as minutes played, distance covered, sprints, accelerations, and more.";
+
+        // Simulate fetching data and processing the response
+        const data = {
+            response: response,
+            links_info: linksInfo
+        };
+
+        // Simulate the .then(data => { ... }) part
+        console.log('Received data:', data);
+        messages.push({ role: "assistant", content: processLinks2(data.response, data.links_info) });
+        displayMessages();
+    </script>
+</body>
+</html>
