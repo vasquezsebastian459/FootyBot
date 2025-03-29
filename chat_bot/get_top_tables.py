@@ -99,9 +99,6 @@ class TopTables:
         
         return self.top_tables
 
-        # self.top_table2col = self.extract_table2col()
-
-        # As of Now we have no ORDERING ALGORITHM
         
         
 
@@ -134,22 +131,4 @@ if __name__ == "__main__":
 
     top_tables = top_tables_extractor.run()
     print(top_tables_extractor.top_tables_names)
-    # embeddings = top_tables_extractor.get_embedding_openai(question)
-    # sim_scores = top_tables_extractor.calc_cosine_sim(embeddings)
-    # print(sim_scores)
-    # print("--------------------------------")
-
-    # top_tables = top_tables_extractor.retrieve_topn_tables_keywords(sim_scores)
-    # print(top_tables)
-    # print("--------------------------------")
-
-    # tables = top_tables_extractor.extract_tables_from_schema(top_tables)
-    # print(tables)
-    # print("--------------------------------")
-
-    # top_tables_extractor.top_table2col = top_tables_extractor.extract_table2col()
-    # print(top_tables_extractor.top_table2col)
-
     
-    
-
