@@ -88,13 +88,13 @@ user_intention = {"player": "Daley Sinkgraven", "action": "top scorer"}
 #         'Daley Sinkgraven': {
 # 'id': 151980,            'start_pos': 58,
 #  'end_pos': 74,
-#             'link': 'https://pro.driblab.com/player/151980'
+#             'link': 'https://example.com/player/151980'
 #         }
 #     },
 #     'teams': {
 #         'UD Las Palmas': {
 #         'id': 14350,
-#     'start_pos': 80,            'end_pos': 93,'link': 'https://pro.driblab.com/team/14350'
+#     'start_pos': 80,            'end_pos': 93,'link': 'https://example.com/team/14350'
 #         }
 #     },
 #     'seasons': {

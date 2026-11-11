@@ -6,7 +6,7 @@ import json
 
 # Reduce Players only to include players in the leagues of interest
 
-leagues_of_interest_path = f"/Users/sebastianvasquez/BBA_Chatbot/entity_recognition/DB_data/leagues_matching.json"
+leagues_of_interest_path = "entity_recognition/DB_data/leagues_matching.json"
 
 leagues_of_interest = json.load(open(leagues_of_interest_path))
 
