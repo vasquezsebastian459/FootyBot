@@ -1,0 +1,28 @@
+# API and web server
+flask
+flask-cors
+requests
+python-dotenv
+
+# LLM and embeddings
+openai
+sentence-transformers
+
+# NLP models (NER, intent and question classifiers)
+spacy
+transformers
+torch
+
+# Database and SQL handling
+psycopg2-binary
+sqlparse
+
+# Data and matching
+numpy
+pandas
+scikit-learn
+rapidfuzz
+
+# Utilities
+colorama
+psutil
