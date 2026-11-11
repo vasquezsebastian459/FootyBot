@@ -7,7 +7,7 @@ import logging
 
 # Configure logging to include the timestamp
 logging.basicConfig(
-    filename='/Users/sebastianvasquez/BBA_Chatbot/chat_bot/cron_test.log', 
+    filename='chat_bot/cron_test.log', 
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
@@ -73,4 +73,4 @@ output_directory = 'chat_bot/temporary_logs_test'
 
 logging.info('Script finished')
 
-# 53 18 * * * /Users/svasquez/driblab/dl-vision/.venv/bin/python3 /Users/svasquez/driblab/dl-vision/chat_bot/json_organizer.py
+# 53 18 * * * <repo>/.venv/bin/python3 <repo>/chat_bot/json_organizer.py

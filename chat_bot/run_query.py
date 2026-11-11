@@ -11,9 +11,7 @@ from print_colors import print_colored,print_colored_full_line
 import time
 from datetime import datetime
 
-from dotenv import load_dotenv
-
-load_dotenv()
+from db_config import DB_PARAMS
 
 
 # Function to get the current time in a human-readable format
@@ -25,14 +23,7 @@ connection_pool = None
 
 def init_connection_pool():
     global connection_pool
-    db_params = {
-        'dbname': 'madridlabs',
-        'user': 'arrigo',
-        'password': os.getenv('DRIBLAB_DB_PASSWORD'),
-        'host': 'db.driblab.com',
-        'port': '5432',
-    }
-    connection_pool = psycopg2.pool.SimpleConnectionPool(1, 10, **db_params)
+    connection_pool = psycopg2.pool.SimpleConnectionPool(1, 10, **DB_PARAMS)
     # print_colored_full_line("", "CYAN")
     print_colored(f"Database connection pool initialized at: {get_readable_time()}", "CYAN")
     print_colored_full_line("", "CYAN")
@@ -48,16 +39,7 @@ def close_connection_pool():
     else:
         print_colored("Connection pool was not initialized or already closed", "RED")
         print_colored_full_line("", "RED")
-db_password = os.getenv('DB_PASSWORD', 'default_value')
-
-# Database connection parameters
-db_params = {
-    'dbname': 'madridlabs',
-    'user': 'api',
-    'password': db_password,
-    'host': 'db.driblab.com',
-    'port': '5432',
-} 
+db_params = DB_PARAMS
 
 def extract_table(query):
     match = re.search(r'(FROM|JOIN)\s+([\w.]+)', query, re.IGNORECASE)

@@ -5,15 +5,9 @@ import psycopg2
 
 
 
-db_password = os.getenv('DB_PASSWORD', 'default_value')
-# Database connection parameters
-db_params = {
-    'dbname': 'madridlabs',
-    'user': 'api',
-    'password': db_password,
-    'host': 'db.driblab.com',
-    'port': '5432',
-} 
+from db_config import DB_PARAMS
+
+db_params = DB_PARAMS
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(**db_params)

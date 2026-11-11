@@ -349,7 +349,7 @@ def validate_sql_query(sql_query,schema):
 
 # EXAMPLE USAGE
 
-schema_path = '/Users/sebastianvasquez/BBA_Chatbot/chat_bot/schemas/database_schema.md'
+schema_path = 'chat_bot/schemas/database_schema.md'
 # schema_path = 'chat_bot/schemas/database_schema.md'
 schema =create_table2columns_dict2(schema_path)
 schema = {key.split('.')[1]: value for key, value in schema.items() if len(key.split('.')) > 1} # THis removes the public. from the table name or any name before "."

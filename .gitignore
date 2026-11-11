@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+.DS_Store
+.ipynb_checkpoints/
+
+# Data, models and outputs (not in the repo)
+chat_bot/db_datasets/
+chat_bot/schemas/
+chat_bot/chat_responses/
+chat_bot/embedding/open_ai_embeddings/
+entity_recognition/
+user_intention/
+question_classifier/
+*.log
